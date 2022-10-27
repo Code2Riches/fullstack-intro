@@ -1,5 +1,7 @@
 import "./App.css";
 import { useEffect, useState } from "react";
+import BlogList from "./Components/BlogList";
+// import BlogListCard from "./Components/BlogListCard";
 
 const sampleBlogs = [
   {
@@ -39,47 +41,33 @@ const sampleBlogs = [
   },
 ];
 
-const BlogList = (props) => {
-  const {blogs} = props
-  
-  return (
-    <div>
-      {props.blogs.map((blog, index) => {
-	      return <BlogListCard blog={blog} key={index} />;
-      })}
-    </div>
-  )
-}
-
-const BlogListCard = (props) => {
-  const {blog} = props;
-
-  return (
-    <div>
-      <h2>{props.blog.title}</h2>
-      <p>{props.blog.author}</p>
-      <p>{props.blog.text}</p>
-    </div>
-  )
-}
-
+// Everytime .env file is added/updated in the application, you will have to restart your react terminal process.
 const urlEndpoint = process.env.REACT_APP_URL_ENDPOINT;
 
 const App = () => {
+  // State Variable "blogs", initialized to "sampleBlogs" (copy of "sampleBlogs using spread operator(...))
   const [blogs, setBlogs] = useState([...sampleBlogs]);
 
+  // Invocation of useEffect hook with empty function passed in as the 1st argument & empty array passed in as 2nd
+  // useEffect((empty func)=>{}, [empty array])
   useEffect(() => {
+    // fetchBlogs async function
     const fetchBlogs = async () => {
+      // This awaited invocation of fetch is going to make an HTTP request to the url string passed into the fetch() function. The variable result will be an object containing the HTTP result of the request; which includes the response payload as well as information of the response itself.
       const result = await fetch(`${urlEndpoint}/blogs`);
+      // The result.json() method retrieves the actual data/payload of the response and assigns it to the variable result.
       const blogs = await result.json();
       console.log(blogs)
+      // Call setBlogs with the blogs variable passed in as the argument.
       setBlogs(blogs);
     };
+    // Invoke fetchBlogs
     fetchBlogs();
   }, []);
 
 	return (
 		<div className="App-header">
+      {/* "blogs" state variable passed as a prop, into "BlogList" Instance */}
       <BlogList blogs={blogs} />
 		</div>
 	);
