@@ -1,7 +1,8 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import BlogList from "./Components/BlogList";
-// import BlogListCard from "./Components/BlogListCard";
+import BlogListCard from "./Components/BlogListCard";
+import OptionBar from "./Components/OptionBar";
 
 const sampleBlogs = [
   {
@@ -47,6 +48,13 @@ const urlEndpoint = process.env.REACT_APP_URL_ENDPOINT;
 const App = () => {
   // State Variable "blogs", initialized to "sampleBlogs" (copy of "sampleBlogs using spread operator(...))
   const [blogs, setBlogs] = useState([...sampleBlogs]);
+  const [urlParamString, setUrlParamString] = useState("");
+
+  const generateUrlParams = (limit, page, sortBy, order) => {
+    let urlParams = `?limit=${limit}&page=${page}&sortBy=${sortBy}&order=${order}`;
+
+    setUrlParamString(urlParams);
+  };
 
   // Invocation of useEffect hook with empty function passed in as the 1st argument & empty array passed in as 2nd
   // useEffect((empty func)=>{}, [empty array])
@@ -54,19 +62,20 @@ const App = () => {
     // fetchBlogs async function
     const fetchBlogs = async () => {
       // This awaited invocation of fetch is going to make an HTTP request to the url string passed into the fetch() function. The variable result will be an object containing the HTTP result of the request; which includes the response payload as well as information of the response itself.
-      const result = await fetch(`${urlEndpoint}/blogs`);
+      const result = await fetch(`${urlEndpoint}/blogs${urlParamString}`);
       // The result.json() method retrieves the actual data/payload of the response and assigns it to the variable result.
-      const blogs = await result.json();
-      console.log(blogs)
+      const fetchedBlogs = await result.json();
+      // console.log(blogs)
       // Call setBlogs with the blogs variable passed in as the argument.
-      setBlogs(blogs);
+      setBlogs(fetchedBlogs);
     };
     // Invoke fetchBlogs
     fetchBlogs();
-  }, []);
+  }, [urlParamString]);
 
 	return (
 		<div className="App-header">
+      <OptionBar generateUrlParams={generateUrlParams}/>
       {/* "blogs" state variable passed as a prop, into "BlogList" Instance */}
       <BlogList blogs={blogs} />
 		</div>
